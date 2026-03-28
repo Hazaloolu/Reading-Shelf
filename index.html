@@ -181,7 +181,15 @@ footer { text-align:center; padding:1.5rem; font-family:'DM Mono',monospace; fon
     <div id="today-card">
       <div class="today-tag">Your article for today</div>
       <div id="today-title">—</div>
-      <div id="today-note"></div>
+     <div id="today-note"></div>
+      <div id="song-card" style="display:none; margin-bottom:1.4rem; padding:.9rem 1.2rem; background:rgba(255,255,255,.07); border-radius:4px; border-left:3px solid var(--amber);">
+        <div id="song-loading" style="font-family:'DM Mono',monospace; font-size:.68rem; color:rgba(245,240,232,.35); letter-spacing:.08em;">Finding a song for this read...</div>
+        <div id="song-content" style="display:none;">
+          <div style="font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--amber-l); margin-bottom:.4rem;">Song for the read</div>
+          <div id="song-title" style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:400; color:var(--paper); line-height:1.3;"></div>
+          <div id="song-reason" style="font-size:.82rem; color:rgba(245,240,232,.5); font-style:italic; margin-top:.25rem; line-height:1.5;"></div>
+        </div>
+      </div>
       <div class="today-actions">
         <button class="btn-wa" id="btn-send-now" onclick="sendNow()">Send to WhatsApp</button>
         <a class="btn-outline" id="btn-open" href="#" target="_blank">Open Article</a>
