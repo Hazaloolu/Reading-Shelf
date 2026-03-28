@@ -70,10 +70,33 @@ export default async function handler(req, res) {
   }
 
   // Pick article
-  const article = pickArticle(articles);
+const article = pickArticle(articles);
 
-  // Build message
-  const msg = `📖 *Your essay/article read for the day*\n\n*${article.title}*\n\n${article.link || ''}\n\n_The Reading Shelf_`;
+// Get song recommendation from Gemini
+let songSection = '';
+try {
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000';
+
+  const songRes = await fetch(`${baseUrl}/api/recommend-song`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: article.title, note: article.note }),
+  });
+
+  if (songRes.ok) {
+    const song = await songRes.json();
+    if (song.song && song.artist) {
+      songSection = `\n\n🎵 *Song for the read*\n${song.song} — ${song.artist}\n_${song.reason || ''}_`;
+    }
+  }
+} catch (e) {
+  console.error('Song recommendation failed:', e.message);
+}
+
+// Build message
+const msg = `📖 *Your essay/article read for the day*\n\n*${article.title}*\n\n${article.link || ''}${songSection}\n\n_The Reading Shelf_`;
 
   // Send
   const { sent, raw } = await sendViaUltraMsg(cfg.instance, cfg.token, cfg.phone, msg);
