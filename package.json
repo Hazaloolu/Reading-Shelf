@@ -1,0 +1,11 @@
+{
+  "name": "reading-shelf",
+  "version": "1.0.0",
+  "description": "Personal reading list with daily WhatsApp notifications",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
