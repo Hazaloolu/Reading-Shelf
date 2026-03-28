@@ -371,6 +371,35 @@ function showToday() {
   document.getElementById('today-note').textContent  = todayPick.note || '';
   document.getElementById('btn-open').href = todayPick.link || '#';
   updateNextLabel();
+  fetchSong(todayPick);
+}
+
+async function fetchSong(article) {
+  const card    = document.getElementById('song-card');
+  const loading = document.getElementById('song-loading');
+  const content = document.getElementById('song-content');
+  card.style.display = 'block';
+  loading.style.display = 'block';
+  content.style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/recommend-song', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: article.title, note: article.note }),
+    });
+    const data = await res.json();
+    if (data.song && data.artist) {
+      document.getElementById('song-title').textContent  = `${data.song} — ${data.artist}`;
+      document.getElementById('song-reason').textContent = data.reason || '';
+      loading.style.display = 'none';
+      content.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  } catch(e) {
+    card.style.display = 'none';
+  }
 }
 
 function shuffle() { todayPick = choosePick(); showToday(); }
