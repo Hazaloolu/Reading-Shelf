@@ -375,12 +375,14 @@ function showToday() {
 }
 
 async function fetchSong(article) {
-  const card    = document.getElementById('song-card');
-  const loading = document.getElementById('song-loading');
-  const content = document.getElementById('song-content');
-  card.style.display = 'block';
-  loading.style.display = 'block';
-  content.style.display = 'none';
+  const card      = document.getElementById('song-card');
+  const loadingEl = document.getElementById('song-loading');
+  const contentEl = document.getElementById('song-content');
+
+  card.style.display      = 'block';
+  loadingEl.style.display = 'block';
+  loadingEl.textContent   = 'Finding a song for this read...';
+  contentEl.style.display = 'none';
 
   try {
     const res  = await fetch('/api/recommend-song', {
@@ -389,16 +391,22 @@ async function fetchSong(article) {
       body: JSON.stringify({ title: article.title, note: article.note }),
     });
     const data = await res.json();
+
+    if (!res.ok) {
+      loadingEl.textContent = 'Could not load song: ' + (data.error || 'Unknown error');
+      return;
+    }
+
     if (data.song && data.artist) {
       document.getElementById('song-title').textContent  = `${data.song} — ${data.artist}`;
       document.getElementById('song-reason').textContent = data.reason || '';
-      loading.style.display = 'none';
-      content.style.display = 'block';
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'block';
     } else {
-      card.style.display = 'none';
+      loadingEl.textContent = 'No song recommendation available.';
     }
   } catch(e) {
-    card.style.display = 'none';
+    loadingEl.textContent = 'Could not reach recommendation service.';
   }
 }
 
