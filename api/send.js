@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getSongRecommendation } from './recommend-song.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -72,29 +73,20 @@ export default async function handler(req, res) {
   // Pick article
 const article = pickArticle(articles);
 
-// Get song recommendation from Gemini
-let songSection = '';
-try {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
-
-  const songRes = await fetch(`${baseUrl}/api/recommend-song`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title: article.title, note: article.note }),
-  });
-
-  if (songRes.ok) {
-    const song = await songRes.json();
-    if (song.song && song.artist) {
-      songSection = `\n\n🎵 *Song for the read*\n${song.song} — ${song.artist}\n_${song.reason || ''}_`;
+// Get song recommendation directly from Gemini
+  let songSection = '';
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const song = await getSongRecommendation(article.title, article.note);
+      if (song.song && song.artist) {
+        songSection = `\n\n🎵 *Song for the read*\n${song.song} — ${song.artist}\n_${song.reason || ''}_`;
+      }
+    } catch (e) {
+      console.error('Song recommendation failed:', e.message);
     }
   }
-} catch (e) {
-  console.error('Song recommendation failed:', e.message);
-}
 
+  
 // Build message
 const msg = `📖 *Your essay/article read for the day*\n\n*${article.title}*\n\n${article.link || ''}${songSection}\n\n_The Reading Shelf_`;
 
